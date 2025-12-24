@@ -1,0 +1,37 @@
+name: Guardrails
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-guardrails:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check PR description
+        run: |
+          if [[ -z "${{ github.event.pull_request.body }}" ]]; then
+            echo "⚠️ Warning: PR description is empty"
+            echo "Please include:"
+            echo "- Summary section"
+            echo "- Testing section"
+            exit 0
+          fi
+          echo "✅ PR description present"
+
+      - name: Check for scope creep
+        run: |
+          echo "🔍 Checking for out-of-scope patterns..."
+          
+          # Check for common scope violations
+          if git diff origin/main... | grep -iE "(auth|billing|database|queue|cron)"; then
+            echo "⚠️ Warning: Potential scope creep detected"
+            echo "Please review changes for out-of-scope features"
+          else
+            echo "✅ No obvious scope violations detected"
+          fi
+        continue-on-error: true
