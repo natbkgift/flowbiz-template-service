@@ -31,7 +31,8 @@ jobs:
           echo "🔍 Checking for out-of-scope patterns..."
           
           # Check for common scope violations
-          if git diff origin/main... | grep -iE "(auth|billing|database|queue|cron)"; then
+          SCOPE_VIOLATIONS=$(git diff origin/main... | grep -iE "(auth|billing|database|queue|cron)" || true)
+          if [ -n "$SCOPE_VIOLATIONS" ]; then
             echo "⚠️ Warning: Potential scope creep detected"
             echo "Please review changes for out-of-scope features"
           else
