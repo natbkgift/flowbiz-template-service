@@ -24,4 +24,5 @@ USER appuser
 EXPOSE 8000
 
 # Run the application
-CMD ["python", "-m", "uvicorn", "apps.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use environment variables for host and port configuration
+CMD uvicorn apps.api.main:app --host ${APP_HOST:-0.0.0.0} --port ${APP_PORT:-8000}
