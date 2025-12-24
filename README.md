@@ -1,5 +1,15 @@
 # FlowBiz Template Service
 
+> ⚠️ IMPORTANT  
+> ก่อน deploy โปรเจคนี้ขึ้น VPS  
+> ต้องอ่าน:  
+> - VPS status: docs/VPS_STATUS.md (ใน flowbiz-ai-core)  
+> - Agent onboarding rules: docs/AGENT_ONBOARDING.md  
+>   
+> การ deploy โดยไม่อ่านเอกสารนี้ถือว่า "ผิดกติกา"
+
+**Where to find:** See [natbkgift/flowbiz-ai-core](https://github.com/natbkgift/flowbiz-ai-core) → `docs/VPS_STATUS.md` and `docs/AGENT_ONBOARDING.md`
+
 [![CI](https://github.com/natbkgift/flowbiz-template-service/actions/workflows/ci.yml/badge.svg)](https://github.com/natbkgift/flowbiz-template-service/actions/workflows/ci.yml)
 
 Production-ready client service template for FlowBiz AI Core integration. This is a **template repository** designed for reuse across customer projects.
