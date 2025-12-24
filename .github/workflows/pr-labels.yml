@@ -21,15 +21,18 @@ jobs:
         run: |
           echo "🏷️ Suggested labels based on changed files:"
           
-          if git diff --name-only origin/main... | grep -E "(^apps/|^packages/)"; then
+          CORE_CHANGES=$(git diff --name-only origin/main... | grep -E "(^apps/|^packages/)" || true)
+          if [ -n "$CORE_CHANGES" ]; then
             echo "- persona:core (application code changes)"
           fi
           
-          if git diff --name-only origin/main... | grep -E "(Dockerfile|docker-compose|nginx/)"; then
+          INFRA_CHANGES=$(git diff --name-only origin/main... | grep -E "(Dockerfile|docker-compose|nginx/)" || true)
+          if [ -n "$INFRA_CHANGES" ]; then
             echo "- persona:infra (infrastructure changes)"
           fi
           
-          if git diff --name-only origin/main... | grep -E "(^docs/|README.md)"; then
+          DOCS_CHANGES=$(git diff --name-only origin/main... | grep -E "(^docs/|README.md)" || true)
+          if [ -n "$DOCS_CHANGES" ]; then
             echo "- persona:docs (documentation changes)"
           fi
           
