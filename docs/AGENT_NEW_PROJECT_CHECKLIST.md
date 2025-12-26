@@ -104,18 +104,18 @@ You MUST read and verify ALL items before proceeding with ANY deployment-related
 
 ### Development Testing
 - [ ] `docker compose up` starts successfully
-- [ ] Service is accessible on http://127.0.0.1:PORT/healthz
-- [ ] Service is accessible on http://127.0.0.1:PORT/v1/meta
+- [ ] Service is accessible on http://127.0.0.1:8000/healthz (replace 8000 with your assigned port)
+- [ ] Service is accessible on http://127.0.0.1:8000/v1/meta (replace 8000 with your assigned port)
 - [ ] No errors in docker logs
 - [ ] Service restarts automatically on code changes (dev mode)
 
 ### Health Endpoint Testing
 ```bash
-# Replace PORT with your assigned port
-curl http://127.0.0.1:PORT/healthz
+# Replace 8000 with your assigned port if different
+curl http://127.0.0.1:8000/healthz
 # Expected: {"status":"ok","service":"...","version":"..."}
 
-curl http://127.0.0.1:PORT/v1/meta
+curl http://127.0.0.1:8000/v1/meta
 # Expected: {"service":"...","environment":"...","version":"...","build_sha":"..."}
 ```
 
@@ -164,9 +164,9 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 
 ### After Service Deployment
 ```bash
-# On VPS, as your user
-curl http://127.0.0.1:PORT/healthz
-curl http://127.0.0.1:PORT/v1/meta
+# On VPS, as your user (replace 8000 with your assigned port)
+curl http://127.0.0.1:8000/healthz
+curl http://127.0.0.1:8000/v1/meta
 ```
 - [ ] Service responds on localhost
 - [ ] Health endpoints return correct responses
