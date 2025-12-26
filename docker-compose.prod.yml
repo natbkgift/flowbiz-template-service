@@ -6,19 +6,3 @@ services:
       - APP_ENV=prod
     volumes: []
     restart: always
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/templates:/etc/nginx/templates:ro
-      - ./nginx/snippets:/etc/nginx/snippets:ro
-    environment:
-      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
-      - BACKEND_HOST=api
-      - BACKEND_PORT=8000
-    depends_on:
-      - api
-    restart: always
