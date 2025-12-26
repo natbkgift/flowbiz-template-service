@@ -129,7 +129,9 @@ curl https://yourdomain.com/v1/meta
 - [AGENT_NEW_PROJECT_CHECKLIST.md](AGENT_NEW_PROJECT_CHECKLIST.md) for deployment checklist
 - Contact infrastructure team for nginx/SSL issues
 
---- Monitoring
+---
+
+## Monitoring
 
 ### Health Checks
 ```bash

@@ -39,7 +39,7 @@ You MUST read and verify ALL items before proceeding with ANY deployment-related
 - [ ] APP_HOST is set to `127.0.0.1` (NOT `0.0.0.0`)
 - [ ] APP_PORT matches assigned port
 - [ ] No services expose public ports directly
-- [ ] docker-compose.yml ports section maps correctly (e.g., "8001:8001")
+- [ ] docker-compose.yml ports section maps correctly (e.g., "127.0.0.1:8001:8001")
 
 ### Health Endpoints
 - [ ] GET /healthz endpoint exists
