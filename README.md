@@ -199,8 +199,8 @@ flowbiz-template-service/
 │       ├── config.py     # Environment configuration
 │       ├── logging.py    # Logging setup
 │       └── schemas/      # Pydantic models
-├── nginx/                # Nginx configuration
-│   ├── templates/        # Config templates
+├── nginx/                # Nginx reference templates (NOT used in docker-compose)
+│   ├── templates/        # Config templates for infrastructure team
 │   └── snippets/         # Reusable config snippets
 ├── docs/                 # Documentation
 ├── tests/                # Test suite

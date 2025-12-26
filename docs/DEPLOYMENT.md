@@ -140,14 +140,13 @@ docker compose ps
 
 # Application logs
 docker compose logs -f api
-
-# Nginx logs
-docker compose logs -f nginx
 ```
 
+**Note:** Nginx logs are in system nginx, not in your docker-compose. Contact infrastructure team for nginx logs.
+
 ### Endpoints
-- Health: `GET /healthz` - Accessible via localhost or public domain (after nginx config)
-- Metadata: `GET /v1/meta` - Accessible via localhost or public domain (after nginx config)
+- Health: `GET /healthz` - Always accessible via localhost (http://127.0.0.1:PORT/healthz), accessible via public domain after nginx configuration by infrastructure team
+- Metadata: `GET /v1/meta` - Always accessible via localhost (http://127.0.0.1:PORT/v1/meta), accessible via public domain after nginx configuration by infrastructure team
 
 ## Updates
 

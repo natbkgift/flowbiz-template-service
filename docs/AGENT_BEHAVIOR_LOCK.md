@@ -66,7 +66,7 @@ services:
     environment:
       - APP_HOST=0.0.0.0  # ❌ PUBLIC BINDING FORBIDDEN
     ports:
-      - "8001:8001"  # ❌ EXPOSES TO ALL INTERFACES
+      - "8001:8001"  # ❌ BINDS TO 0.0.0.0:8001 (ALL INTERFACES)
 ```
 
 **WHY:** Shared VPS has multiple projects. Public binding creates security risks and port conflicts.
