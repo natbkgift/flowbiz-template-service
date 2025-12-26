@@ -40,7 +40,7 @@ Service metadata endpoint.
 
 ### Runtime Configuration (APP_*)
 - `APP_ENV`: Environment (dev|prod)
-- `APP_HOST`: Bind host (default: 0.0.0.0)
+- `APP_HOST`: Bind host (default: 127.0.0.1) ⚠️ MUST be localhost for VPS deployment
 - `APP_PORT`: Bind port (default: 8000)
 - `APP_LOG_LEVEL`: Logging level (default: info)
 
@@ -52,8 +52,10 @@ Service metadata endpoint.
 ## Docker
 
 ### Ports
-- Internal: 8000 (FastAPI/Uvicorn)
-- External: 80/443 (Nginx)
+- Internal: 8000 (FastAPI/Uvicorn, bound to 127.0.0.1)
+- External: Managed by system-level nginx (see ADR_SYSTEM_NGINX.md)
+
+⚠️ **IMPORTANT:** Services bind to localhost (127.0.0.1) only. Public access is handled by system-level nginx configured by infrastructure team.
 
 ### Volumes
 - Development: Hot-reload enabled

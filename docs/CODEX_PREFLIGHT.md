@@ -3,6 +3,32 @@
 ## Purpose
 This checklist ensures all changes align with FlowBiz template standards before merging.
 
+## ⚠️ VPS Deployment Compliance (MANDATORY)
+
+Before ANY deployment to shared FlowBiz VPS:
+
+### Required Reading
+- [ ] Read [docs/ADR_SYSTEM_NGINX.md](ADR_SYSTEM_NGINX.md) completely
+- [ ] Read [docs/AGENT_NEW_PROJECT_CHECKLIST.md](AGENT_NEW_PROJECT_CHECKLIST.md) completely
+- [ ] Read [docs/AGENT_BEHAVIOR_LOCK.md](AGENT_BEHAVIOR_LOCK.md) completely
+
+### VPS Architecture Compliance
+- [ ] Services bind to `127.0.0.1` (localhost) ONLY
+- [ ] NO nginx in docker-compose.yml
+- [ ] NO nginx in docker-compose.prod.yml
+- [ ] NO reverse proxy containers (traefik, caddy, ingress, etc.)
+- [ ] Port assignment is documented
+- [ ] APP_HOST is set to `127.0.0.1` (NOT `0.0.0.0`)
+- [ ] docker-compose ports use `127.0.0.1:PORT:PORT` format
+
+### Health Endpoints
+- [ ] GET /healthz works on http://127.0.0.1:PORT/healthz
+- [ ] GET /v1/meta works on http://127.0.0.1:PORT/v1/meta
+- [ ] Both return correct JSON structure
+- [ ] Both return 200 status code
+
+---
+
 ## Pre-Commit Checklist
 
 ### Code Quality
@@ -57,18 +83,23 @@ This checklist ensures all changes align with FlowBiz template standards before 
 
 ### Docker
 - [ ] `docker compose up` starts successfully
+- [ ] Services bind to localhost (127.0.0.1) only
 - [ ] Services can communicate internally
 - [ ] Logs are visible with `docker compose logs`
+- [ ] NO nginx service in docker-compose files
 
 ### Ports
-- [ ] API runs on internal port 8000
-- [ ] Nginx exposes 80/443 externally
-- [ ] No port conflicts
+- [ ] API runs on internal port 8000 (or assigned port)
+- [ ] Port binds to 127.0.0.1 (localhost) only
+- [ ] NO public binding (0.0.0.0)
+- [ ] NO port conflicts
+- [ ] Port documented in PROJECT_CONTRACT.md
 
 ### Security
-- [ ] Security headers present in Nginx config
+- [ ] Service binds to localhost (127.0.0.1) only
+- [ ] Security headers managed by system nginx (not in docker-compose)
 - [ ] No security vulnerabilities introduced
-- [ ] HSTS configured for production
+- [ ] SSL/TLS managed by infrastructure (not in project)
 
 ## Scope Compliance
 
@@ -101,8 +132,11 @@ This checklist ensures all changes align with FlowBiz template standards before 
 ## Documentation
 
 ### Core Docs
+- [ ] `docs/ADR_SYSTEM_NGINX.md` referenced (for VPS projects)
+- [ ] `docs/AGENT_NEW_PROJECT_CHECKLIST.md` referenced (for VPS projects)
+- [ ] `docs/AGENT_BEHAVIOR_LOCK.md` referenced (for VPS projects)
 - [ ] `docs/PROJECT_CONTRACT.md` reflects current API
-- [ ] `docs/DEPLOYMENT.md` includes new deployment steps (if any)
+- [ ] `docs/DEPLOYMENT.md` includes VPS deployment steps
 - [ ] `docs/GUARDRAILS.md` updated with new rules (if any)
 - [ ] This file updated with new checks (if any)
 
@@ -119,9 +153,12 @@ This checklist ensures all changes align with FlowBiz template standards before 
 docker compose down -v
 docker compose up --build
 
-# Test endpoints
-curl http://localhost:8000/healthz
-curl http://localhost:8000/v1/meta
+# Test endpoints (note: 127.0.0.1, not 0.0.0.0)
+curl http://127.0.0.1:8000/healthz
+curl http://127.0.0.1:8000/v1/meta
+
+# Verify localhost binding
+netstat -tlnp | grep 8000  # Should show 127.0.0.1:8000, NOT 0.0.0.0:8000
 
 # Run checks
 ruff check .

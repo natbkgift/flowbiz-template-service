@@ -1,5 +1,16 @@
 # Deployment Guide
 
+## ⚠️ CRITICAL: VPS Deployment Pre-Requisites
+
+**BEFORE deploying to shared FlowBiz VPS, you MUST read:**
+1. [docs/ADR_SYSTEM_NGINX.md](ADR_SYSTEM_NGINX.md) - System architecture
+2. [docs/AGENT_NEW_PROJECT_CHECKLIST.md](AGENT_NEW_PROJECT_CHECKLIST.md) - Deployment checklist
+3. [docs/AGENT_BEHAVIOR_LOCK.md](AGENT_BEHAVIOR_LOCK.md) - Deployment rules
+
+**IF ANY CHECKLIST ITEM IS "NO" → DEPLOYMENT IS FORBIDDEN**
+
+---
+
 ## Prerequisites
 - Docker & Docker Compose
 - Git
@@ -27,11 +38,29 @@ docker compose up --build
 
 ### 4. Verify
 ```bash
-curl http://localhost:8000/healthz
-curl http://localhost:8000/v1/meta
+curl http://127.0.0.1:8000/healthz
+curl http://127.0.0.1:8000/v1/meta
 ```
 
-## Production Deployment
+**Note:** Service binds to localhost (127.0.0.1) only, as required by VPS architecture.
+
+---
+
+## Production Deployment on Shared VPS
+
+### Architecture Overview
+This service follows the **system-level nginx** architecture (see [ADR_SYSTEM_NGINX.md](ADR_SYSTEM_NGINX.md)):
+- Service binds to `127.0.0.1:PORT` (localhost only)
+- System nginx handles public routing, SSL, and domain mapping
+- Infrastructure team configures nginx (NOT you)
+
+### Deployment Flow
+1. **Deploy service** (localhost binding) → YOU do this
+2. **Verify locally** → YOU do this
+3. **Request nginx config** → Infrastructure team does this
+4. **Verify public HTTPS** → After infrastructure completes
+
+---
 
 ### 1. Server Setup
 ```bash
@@ -61,23 +90,46 @@ nano .env
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
-### 4. Configure SSL (Let's Encrypt)
+### 4. Verify Local Access (CRITICAL)
 ```bash
-# Install certbot
-sudo apt-get install certbot python3-certbot-nginx
-
-# Obtain certificate
-sudo certbot --nginx -d yourdomain.com
-
-# Update nginx/snippets/security_headers.conf
-# Uncomment HSTS header
+# Service MUST respond on localhost
+curl http://127.0.0.1:8000/healthz
+curl http://127.0.0.1:8000/v1/meta
 ```
 
-### 5. Verify Production
+✅ **If these work, YOUR deployment is complete.**
+
+### 5. Request Nginx Configuration (Infrastructure Team)
+After verifying local access works:
+1. Open ticket/request for infrastructure team
+2. Provide: service name, port (8000), domain name
+3. Infrastructure team will:
+   - Configure system nginx
+   - Set up SSL certificate
+   - Map domain to your localhost port
+   - Test and reload nginx
+
+**⚠️ DO NOT configure nginx yourself. See [ADR_SYSTEM_NGINX.md](ADR_SYSTEM_NGINX.md).**
+
+### 6. Verify Public Access (After Infrastructure Completes)
 ```bash
-curl http://yourdomain.com/healthz
-curl http://yourdomain.com/v1/meta
+# After infrastructure team completes nginx setup
+curl https://yourdomain.com/healthz
+curl https://yourdomain.com/v1/meta
 ```
+
+---
+
+## Removed: SSL/Nginx Configuration
+
+~~Previous versions had local nginx configuration instructions.~~
+
+**These are now handled by system-level nginx.** See:
+- [ADR_SYSTEM_NGINX.md](ADR_SYSTEM_NGINX.md) for architecture
+- [AGENT_NEW_PROJECT_CHECKLIST.md](AGENT_NEW_PROJECT_CHECKLIST.md) for deployment checklist
+- Contact infrastructure team for nginx/SSL issues
+
+---
 
 ## Monitoring
 
@@ -88,14 +140,13 @@ docker compose ps
 
 # Application logs
 docker compose logs -f api
-
-# Nginx logs
-docker compose logs -f nginx
 ```
 
+**Note:** Nginx logs are in system nginx, not in your docker-compose. Contact infrastructure team for nginx logs.
+
 ### Endpoints
-- Health: `GET /healthz`
-- Metadata: `GET /v1/meta`
+- Health: `GET /healthz` - Always accessible via localhost (http://127.0.0.1:PORT/healthz), accessible via public domain after nginx configuration by infrastructure team
+- Metadata: `GET /v1/meta` - Always accessible via localhost (http://127.0.0.1:PORT/v1/meta), accessible via public domain after nginx configuration by infrastructure team
 
 ## Updates
 
@@ -140,27 +191,34 @@ docker compose up --build
 # Find process using port
 sudo lsof -i :8000
 
-# Change port in .env
-APP_PORT=8001
+# Option 1: Stop conflicting process
+# Option 2: Request different port assignment from infrastructure
+# Update APP_PORT in .env and docker-compose.yml
 ```
 
 ### Nginx Issues
-```bash
-# Test configuration
-docker compose exec nginx nginx -t
+**DO NOT attempt to fix nginx yourself.**
+- Contact infrastructure team
+- Provide: service name, port, domain, error description
+- Do NOT edit /etc/nginx/ files
+- Do NOT restart nginx service
 
-# Reload configuration
-docker compose exec nginx nginx -s reload
-```
+See [ADR_SYSTEM_NGINX.md](ADR_SYSTEM_NGINX.md) for architecture details.
 
 ## Security Checklist
 
-- [ ] SSL certificate installed
-- [ ] HSTS header enabled
-- [ ] Firewall configured (ports 80, 443 only)
-- [ ] Regular security updates
+- [ ] Service binds to 127.0.0.1 (localhost) only
+- [ ] Health endpoints (/healthz, /v1/meta) work locally
+- [ ] No nginx in docker-compose.yml
+- [ ] Port assignment documented and approved
+- [ ] Infrastructure team notified for nginx/SSL setup
+- [ ] SSL certificate managed by infrastructure (Let's Encrypt)
+- [ ] Firewall managed by infrastructure
+- [ ] Regular security updates (container images)
 - [ ] Log monitoring enabled
 - [ ] Backup strategy defined
+
+**Note:** SSL, HSTS headers, firewall, and nginx are managed by system-level infrastructure.
 
 ## Performance
 
